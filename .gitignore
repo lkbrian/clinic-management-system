@@ -1,0 +1,6 @@
+Pipfile
+Pipfile.lock
+requirements.txt
+project_structure.txt
+
+project/__pycache__
