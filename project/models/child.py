@@ -1,6 +1,7 @@
 from sqlalchemy import Column,Integer,String,Date
 from sqlalchemy.orm import relationship
-from models import Base
+from models import Base,session
+from datetime import datetime, date
 
 
 class Child(Base):
@@ -20,3 +21,23 @@ class Child(Base):
 
     def __repr__(self):
         return f"Child name: {self.Fullname}, {self.Age} years"
+    
+    @classmethod
+    def add_child(cls, full_name, Certificate_No, Date_of_birth):
+        Date_of_birth = datetime.strptime(Date_of_birth, "%Y-%m-%d").date()
+        current_date = date.today()
+        age = current_date.year - Date_of_birth.year
+        child = cls(
+            Fullname=full_name,
+            Certificate_No=Certificate_No,
+            Date_Of_Birth=Date_of_birth,
+            Age=age,
+        )
+        try:
+            session.add(child)
+            session.commit()
+            print("Child added succesfully")
+            return child
+        except Exception as e:
+            session.rollback()
+            print(f"Error:{e}")
