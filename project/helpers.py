@@ -10,11 +10,13 @@ def exit_program():
 
 def register_child():
     name = input("Enter Child's Fullname: ")
-    cert_no  = int(input("Enter Child's Certificate Number"))
+    cert_no  = int(input("Enter Child's Certificate Number: "))
     d_o_b = input("Enter child's Date of Birth(YYYY-MM-DD): ")
 
     try:
-        child = Child.add_child(name,cert_no,d_o_b)
-        print(f"Registration sucesfull,add {child}")
+        Child.add_child(name,cert_no,d_o_b)        
     except Exception as error:
         print("Error during registration: ",error)
+
+
+    

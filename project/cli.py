@@ -1,4 +1,5 @@
 # cli.py
+import fire
 
 from helpers import (
     exit_program,
@@ -11,7 +12,7 @@ def main():
         menu()
         choice = input("> ")
         if choice == "0":
-            exit_program()
+            fire.Fire(exit_program)
         elif choice == "1":
             register_child()
         else:
@@ -21,7 +22,7 @@ def main():
 def menu():
     print("Please select an option:")
     print("0. Exit the program")
-    print("1. Some useful function")
+    print("1. Child registration")
 
 
 if __name__ == "__main__":

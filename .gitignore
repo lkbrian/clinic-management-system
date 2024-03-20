@@ -4,3 +4,4 @@ requirements.txt
 project_structure.txt
 
 project/__pycache__
+project/models/__pycache__
