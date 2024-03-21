@@ -87,3 +87,20 @@ class Child(Base):
                 print(f"{child.Fullname} Age {child.Age} Certificate no. {child.Certificate_No}")
         else:
             print(f"No Record of {value} in the system")
+
+    @classmethod
+    def update_child():
+        pass
+
+    @classmethod
+    def get_all_children(cls):
+        try:
+            chlidren = session.query(cls).all()
+            if chlidren:
+                print("All Children")
+                for child in chlidren:
+                    print(child)
+            else:
+                print("No children found.")
+        except Exception as error:
+            print("Error: ",error)

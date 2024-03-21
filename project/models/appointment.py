@@ -118,3 +118,20 @@ class Appointment(Base):
                 )  # Use __repr__ for detailed output
         else:
             print("No appointments found for", value)
+
+    @classmethod
+    def update_appointments():
+        pass
+
+    @classmethod
+    def get_all_appointments(cls):
+        try:
+            appointments = session.query(cls).all()
+            if appointments:
+                print("All Appointments:")
+                for appointment in appointments:
+                    print(appointment)
+            else:
+                print("No appointments found.")
+        except Exception as error:
+            print("Error: ", error)

@@ -76,3 +76,16 @@ class Parent(Base):
                 print(f"Error: {e}")
         else:
             print("Parent not found.")
+
+    @classmethod
+    def get_all_parents(cls):
+        try:
+            parents = session.query(cls).all()
+            if parents:
+                print("All parents")
+                for pair_parent in parents:
+                    print(pair_parent)
+            else:
+                print ("No Parents found.")
+        except Exception as error:
+            print("Error: ",error)
