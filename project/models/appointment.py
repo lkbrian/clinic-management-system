@@ -45,8 +45,8 @@ class Appointment(Base):
     @classmethod
     def set_appointment(
         cls,
-        Childname,
-        Parentname,
+        child_cert_no,
+        parent_id_number,
         Vaccine,
         Status,
         Doctor_Incharge,
@@ -55,11 +55,19 @@ class Appointment(Base):
 
         appointment_date = datetime.strptime(Appointment_Date, "%Y-%m-%d").date()
         if appointment_date > date.today():
+            from models import Parent,Child
+            # Query child and parent names by certificate number and ID number
+            child = session.query(Child).filter_by(Certificate_No=child_cert_no).first()
+            parent = (
+                session.query(Parent).filter_by(National_ID=parent_id_number).first()
+            )
+
             appointment = cls(
                 # Appointment_No=str(uuid.uuid4()),
                 Appointment_No=random.randint(5864, 20000),
-                Childname=Childname,
-                Parentname=Parentname,
+                Childname=child.Fullname,
+                Parentname = parent.Mothers_Name if parent.Mothers_Name else parent.Fathers_Name
+,
                 Vaccine=Vaccine,
                 Status=Status,
                 Doctor_Incharge=Doctor_Incharge,

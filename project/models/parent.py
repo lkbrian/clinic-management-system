@@ -1,13 +1,12 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
-from sqlalchemy.orm import relationship
-from models import Base, session,Child
-from datetime import datetime, date
+from sqlalchemy import Column, Integer, String, or_
+from models import Base, session
+
 
 class Parent(Base):
     __tablename__ = "parents"
     id = Column(Integer, primary_key=True, nullable=False)
-    Fathers_Name = Column(String, nullable=False)
-    Mothers_Name = Column(String, nullable=False)
+    Fathers_Name = Column(String, nullable=True)
+    Mothers_Name = Column(String, nullable=True)
     National_ID = Column(Integer, unique=True, nullable=False)
 
     # children = relationship("Child", back_populates="parent")
@@ -18,20 +17,62 @@ class Parent(Base):
         self.National_ID = National_ID
 
     def __repr__(self):
-            return f"\nRegistered parents: {self.Fathers_Name} and {self.Mothers_Name} \nIdentification: {self.National_ID}"
-        
+        return f"\nRegistered parents: {self.Fathers_Name} and {self.Mothers_Name} \nIdentification: {self.National_ID}"
+
     @classmethod
     def add_parent(cls, Fathersname, Mothersname, National_ID):
-        parent = cls(
-            Fathers_Name=Fathersname,
-            Mothers_Name=Mothersname,
-            National_ID=National_ID
+        if Fathersname or Mothersname:  # At least one parent name should be given
+            parent = cls(
+                Fathers_Name=Fathersname,
+                Mothers_Name=Mothersname,
+                National_ID=National_ID,
+            )
+            try:
+                session.add(parent)
+                session.commit()
+                print(parent)
+                return parent
+            except Exception as e:
+                session.rollback()
+                print(f"Error: {e}")
+        else:
+            print("At least one parent name should be provided.")
+
+    @classmethod
+    def find_parent(cls, value):
+        parents = (
+            session.query(cls)
+            .filter(
+                or_(
+                    cls.Fathers_Name == value,
+                    cls.Mothers_Name == value,
+                    cls.National_ID == value,
+                )
+            )
+            .all()
         )
-        try:
-            session.add(parent)
-            session.commit()
-            print(parent)
-            return parent
-        except Exception as e:
-            session.rollback()
-            print(f"Error: {e}")
+        if parents:
+            for parent in parents:
+                print(f"{parent.Fathers_Name} and {parent.Mothers_Name}")
+
+    @classmethod
+    def update_parent(
+        cls, parent_id, Fathersname=None, Mothersname=None, National_ID=None
+    ):
+        parent = session.query(cls).get(parent_id)
+        if parent:
+            if Fathersname:
+                parent.Fathers_Name = Fathersname
+            if Mothersname:
+                parent.Mothers_Name = Mothersname
+            if National_ID:
+                parent.National_ID = National_ID
+            try:
+                session.commit()
+                print("Parent updated successfully.")
+                print(parent)
+            except Exception as e:
+                session.rollback()
+                print(f"Error: {e}")
+        else:
+            print("Parent not found.")

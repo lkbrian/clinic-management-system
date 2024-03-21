@@ -12,7 +12,6 @@ class Child(Base):
     Date_Of_Birth = Column(Date, nullable=False)
     Age = Column(String)
     parent_id = Column(Integer, ForeignKey("parents.National_ID"))
-
     parent = relationship("Parent", backref="children")
 
     def __init__(self, Fullname, Certificate_No, Date_Of_Birth, parent_id, Age=None):
@@ -80,10 +79,11 @@ class Child(Base):
 
     @classmethod
     def find_child(cls, value):
-        child = session.query(cls).filter(
+        children = session.query(cls).filter(
             or_(cls.Fullname == value, cls.Certificate_No == value)
         ).all()
-        if child:
-            print(child)
+        if children:
+            for child in children:
+                print(f"{child.Fullname} Age {child.Age} Certificate no. {child.Certificate_No}")
         else:
             print(f"No Record of {value} in the system")
