@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from models import Base, session
 from datetime import datetime, date
 import random
-
 # import uuid
 
 
@@ -55,8 +54,8 @@ class Appointment(Base):
 
         appointment_date = datetime.strptime(Appointment_Date, "%Y-%m-%d").date()
         if appointment_date > date.today():
-            from models import Parent,Child
-            # Query child and parent names by certificate number and ID number
+            from models import Parent, Child
+
             child = session.query(Child).filter_by(Certificate_No=child_cert_no).first()
             parent = (
                 session.query(Parent).filter_by(National_ID=parent_id_number).first()
@@ -66,8 +65,9 @@ class Appointment(Base):
                 # Appointment_No=str(uuid.uuid4()),
                 Appointment_No=random.randint(5864, 20000),
                 Childname=child.Fullname,
-                Parentname = parent.Mothers_Name if parent.Mothers_Name else parent.Fathers_Name
-,
+                Parentname=(
+                    parent.Mothers_Name if parent.Mothers_Name else parent.Fathers_Name
+                ),
                 Vaccine=Vaccine,
                 Status=Status,
                 Doctor_Incharge=Doctor_Incharge,
@@ -112,10 +112,11 @@ class Appointment(Base):
         )
         if appointments:
             print("Matching Appointments:")
+
             for appointment in appointments:
                 print(
                     f"\nAppointment number: {appointment.Appointment_No}\nChild: {appointment.Childname}\nParent: {appointment.Parentname} \nDoctor Incharge: {appointment.Doctor_Incharge} \nStatus: {appointment.Status}\nAppointment date: {appointment.Appointment_Date}"
-                )  # Use __repr__ for detailed output
+                )
         else:
             print("No appointments found for", value)
 
@@ -124,13 +125,44 @@ class Appointment(Base):
         pass
 
     @classmethod
+    def get_vaccinated(cls):
+        appointments = session.query(cls).filter_by(Status="vaccinated")
+        if appointments:
+            print("Matching Appointments:")
+            for appointment in appointments:
+                print(
+                    f"\nChild: {appointment.Childname}\nStatus: \033[92m {appointment.Status}\033[0m"
+                )
+        else:
+            print("No appointments found")
+
+    @classmethod
+    def get_unvaccinated(cls):
+        appointments = session.query(cls).filter_by(Status="Unvaccinated")
+        if appointments:
+            print("Matching Appointments:")
+            for appointment in appointments:
+                print(
+                    f"\nChild: {appointment.Childname}\nStatus: \033[91m {appointment.Status}\033[0m"
+                )
+        else:
+            print("No appointments found")
+
+    @classmethod
     def get_all_appointments(cls):
         try:
             appointments = session.query(cls).all()
             if appointments:
-                print("All Appointments:")
+                print("All Appointments")
                 for appointment in appointments:
-                    print(appointment)
+                    if appointment.Status == "vaccinated":                    
+                        print(                    
+                            f"\n--------Appointment for-------- \n{appointment.Childname} by {appointment.Doctor_Incharge} \nScheduled for {appointment.Appointment_Date} \nAccompanied by {appointment.Parentname} \nAppointment Number: {appointment.Appointment_No}\nStatus: \033[92m {appointment.Status}\033[0m \n --------------------------------"                     
+                        )
+                    else:
+                        print(
+                            f"\n--------Appointment for-------- \n{appointment.Childname} by {appointment.Doctor_Incharge} \nScheduled for {appointment.Appointment_Date} \nAccompanied by {appointment.Parentname} \nAppointment Number: {appointment.Appointment_No}\nStatus: \033[91m {appointment.Status} \033[0m \n --------------------------------" 
+                        )
             else:
                 print("No appointments found.")
         except Exception as error:
