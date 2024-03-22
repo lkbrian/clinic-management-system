@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from models import Base, session
 from datetime import datetime, date
 import random
+
 # import uuid
 
 
@@ -92,9 +93,9 @@ class Appointment(Base):
             for appointment in appointments:
                 appointment.Status = "vaccinated"
                 session.commit()
-            print(f"Child {child.Fullname} vaccinated successfully.")
+            print(f"\033[92m Child {child.Fullname} vaccinated successfully.\033[0m")
         else:
-            print("Child not found or certificate number incorrect.")
+            print("\033[91m Child not found or certificate number incorrect.\033[0m")
 
     @classmethod
     def find_appointment(cls, value):
@@ -114,8 +115,13 @@ class Appointment(Base):
             print("Matching Appointments:")
 
             for appointment in appointments:
+                status = (
+                    f"\033[92m {appointment.Status} \033[0m"
+                    if appointment.Status == "vaccinated"
+                    else f"\033[91m {appointment.Status} \033[0m"
+                )
                 print(
-                    f"\nAppointment number: {appointment.Appointment_No}\nChild: {appointment.Childname}\nParent: {appointment.Parentname} \nDoctor Incharge: {appointment.Doctor_Incharge} \nStatus: {appointment.Status}\nAppointment date: {appointment.Appointment_Date}"
+                    f"\nAppointment number: {appointment.Appointment_No}\nChild: {appointment.Childname}\nParent: {appointment.Parentname} \nDoctor Incharge: {appointment.Doctor_Incharge} \nStatus: {status}\nAppointment date: {appointment.Appointment_Date}"
                 )
         else:
             print("No appointments found for", value)
@@ -155,13 +161,13 @@ class Appointment(Base):
             if appointments:
                 print("All Appointments")
                 for appointment in appointments:
-                    if appointment.Status == "vaccinated":                    
-                        print(                    
-                            f"\n--------Appointment for-------- \n{appointment.Childname} by {appointment.Doctor_Incharge} \nScheduled for {appointment.Appointment_Date} \nAccompanied by {appointment.Parentname} \nAppointment Number: {appointment.Appointment_No}\nStatus: \033[92m {appointment.Status}\033[0m \n --------------------------------"                     
+                    if appointment.Status == "vaccinated":
+                        print(
+                            f"\n--------Appointment for-------- \n{appointment.Childname} by {appointment.Doctor_Incharge} \nScheduled for {appointment.Appointment_Date} \nAccompanied by {appointment.Parentname} \nAppointment Number: {appointment.Appointment_No}\nStatus: \033[92m {appointment.Status}\033[0m \n --------------------------------"
                         )
                     else:
                         print(
-                            f"\n--------Appointment for-------- \n{appointment.Childname} by {appointment.Doctor_Incharge} \nScheduled for {appointment.Appointment_Date} \nAccompanied by {appointment.Parentname} \nAppointment Number: {appointment.Appointment_No}\nStatus: \033[91m {appointment.Status} \033[0m \n --------------------------------" 
+                            f"\n--------Appointment for-------- \n{appointment.Childname} by {appointment.Doctor_Incharge} \nScheduled for {appointment.Appointment_Date} \nAccompanied by {appointment.Parentname} \nAppointment Number: {appointment.Appointment_No}\nStatus: \033[91m {appointment.Status} \033[0m \n --------------------------------"
                         )
             else:
                 print("No appointments found.")

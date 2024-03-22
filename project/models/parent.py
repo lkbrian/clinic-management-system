@@ -34,7 +34,7 @@ class Parent(Base):
                 return parent
             except Exception as e:
                 session.rollback()
-                print(f"Error: {e}")
+                print(f"\033[91m Error: {e} \033[0m")
         else:
             print("At least one parent name should be provided.")
 
@@ -53,7 +53,9 @@ class Parent(Base):
         )
         if parents:
             for parent in parents:
-                print(f"{parent.Fathers_Name} and {parent.Mothers_Name}")
+                print(f"\n{parent.Fathers_Name} and {parent.Mothers_Name}")
+        else:
+            print("\033[91m No Parents were found!\033[0m")
 
     @classmethod
     def update_parent(
@@ -73,9 +75,9 @@ class Parent(Base):
                 print(parent)
             except Exception as e:
                 session.rollback()
-                print(f"Error: {e}")
+                print(f" \033[91m Error: {e} \033[0m")
         else:
-            print("Parent not found.")
+            print("\033[91m Parent not found. \033[0m")
 
     @classmethod
     def get_all_parents(cls):

@@ -1,5 +1,6 @@
 # interface.py
 from models import Parent, Child, Appointment
+import subprocess
 import click
 import sys
 
@@ -20,10 +21,10 @@ def userinterface():
 def register_child(name, cert_no, d_o_b, parent_id):
     try:
         Child.add_child(name, cert_no, d_o_b, parent_id)
-        click.echo("Child registered successfully.")
+        click.echo("\033[92m Child registered successfully.\033[0m")
 
     except Exception as error:
-        click.echo("Error during child registration: ", error)
+        click.echo(f"\033[92m Error during child registration: {error}\033[0m" )
     consecutive_registration_action()
 
 
@@ -36,10 +37,10 @@ def register_child(name, cert_no, d_o_b, parent_id):
 def register_parent(father, mother, national_id):
     try:
         Parent.add_parent(father, mother, national_id)
-        click.echo("Parent registered successfully.")
+        click.echo("\033[92m Parent registered successfully.\033[0m")
 
     except Exception as error:
-        click.echo("Error during parent registration: ", error)
+        click.echo(f"\033[91m Error during parent registration: {error}\033[0m")
     consecutive_registration_action()
 
 
@@ -57,11 +58,11 @@ def register_appointment(
         Appointment.set_appointment(
             child_name, parent_name, vaccine, status, doctor, appointment_date
         )
-        click.echo("Appointment set successfully.")
+        click.echo("\033[92m Appointment set successfully.\033[0m")
     except Exception as error:
-        click.echo("Error during appointment setting: ", error)
+        click.echo(f"\033[91m Error during appointment setting:  {error}\033[0m")
 
-
+# Find commands
 @click.command()
 @click.option("--value", prompt="Enter Name of either Parents/National ID")
 def find_parent(value):
@@ -92,6 +93,50 @@ def find_appointment(value):
         print("Error: ",e)
     consecutive_find_data_action()
 
+#Listing commands
+@click.command()
+def list_parents():
+    try:
+        Parent.get_all_parents()
+    except Exception as e:
+        print("Error: ",e)
+    consecutive_list_data_action()
+
+@click.command()
+def list_children():
+    try:
+        Child.get_all_children()
+    except Exception as e:
+        print("Error: ",e)
+    consecutive_list_data_action()
+
+@click.command()
+def list_appointments():
+    try:
+        Appointment.get_all_appointments()
+    except Exception as e:
+        print("Error: ",e)
+    consecutive_list_data_action()
+
+@click.command()
+def list_vaccinated():
+    try:
+        Appointment.get_vaccinated()
+    except Exception as e:
+        print("Error: ",e)
+    consecutive_list_data_action()
+
+
+@click.command()
+def list_unvaccinated():
+    try:
+        Appointment.get_unvaccinated()
+    except Exception as e:
+        print("Error: ",e)
+    consecutive_list_data_action()
+
+
+
 
 userinterface.add_command(register_parent)
 userinterface.add_command(register_child)
@@ -99,6 +144,11 @@ userinterface.add_command(register_appointment)
 userinterface.add_command(find_parent)
 userinterface.add_command(find_child)
 userinterface.add_command(find_appointment)
+userinterface.add_command(list_parents)
+userinterface.add_command(list_children)
+userinterface.add_command(list_appointments)
+userinterface.add_command(list_vaccinated)
+userinterface.add_command(list_unvaccinated)
 
 def Registration():
     while True:
@@ -113,7 +163,7 @@ def Registration():
         elif choice == 4:
             main()
         else:
-            click.echo("Invalid choice")
+            click.echo("\033[91m Invalid choice \033[0m")
 
 
 def Updates():
@@ -129,7 +179,7 @@ def Updates():
         elif choice == 4:
             sys.exit()
         else:
-            click.echo("Invalid choice")
+            click.echo("\033[91m Invalid choice \033[0m")
 
 
 def Find_Data():
@@ -139,29 +189,33 @@ def Find_Data():
         if choice == 1:
             find_parent()
         elif choice == 2:
-            register_child()
+            find_child()
         elif choice == 3:
-            register_appointment()
+            find_appointment()
         elif choice == 4:
             main()
         else:
-            click.echo("Invalid choice")
+            click.echo("\033[91m Invalid choice \033[0m")
 
 
 def List_Data():
     while True:
-        registration_menu()
+        List_data_menu()
         choice = click.prompt("Please enter your choice", type=int)
         if choice == 1:
-            register_parent()
+            list_parents()
         elif choice == 2:
-            register_child()
+            list_children()
         elif choice == 3:
-            register_appointment()
+            list_appointments()
         elif choice == 4:
-            sys.exit()
+            list_unvaccinated()
+        elif choice == 7:
+            list_vaccinated()
+        elif choice == 8:
+            main()
         else:
-            click.echo("Invalid choice")
+            click.echo("\033[91m Invalid choice \033[0m")
 
 
 def consecutive_list_data_action():
@@ -171,11 +225,11 @@ def consecutive_list_data_action():
     choice = click.prompt("Select a choice", type=int)
 
     if choice == 1:
-        Registration()
+        List_Data()
     elif choice == 2:
         main()
     else:
-        click.echo("Invalid choice")
+        click.echo("\033[91m Invalid choice \033[0m")
 
 
 def consecutive_find_data_action():
@@ -189,7 +243,7 @@ def consecutive_find_data_action():
     elif choice == 2:
         main()
     else:
-        click.echo("Invalid choice")
+        click.echo("\033[91m Invalid choice \033[0m")
 
 
 def consecutive_updates_action():
@@ -203,7 +257,7 @@ def consecutive_updates_action():
     elif choice == 2:
         main()
     else:
-        click.echo("Invalid choice")
+        click.echo("\033[91m Invalid choice \033[0m")
 
 
 def consecutive_registration_action():
@@ -217,7 +271,7 @@ def consecutive_registration_action():
     elif choice == 2:
         main()
     else:
-        click.echo("Invalid choice")
+        click.echo("\033[91m Invalid choice \033[0m")
 
 
 def List_data_menu():
@@ -270,11 +324,11 @@ def main():
             click.echo("\033[92m Get Better Soon,We Are Happy To See You Leave\033[0m ")
             sys.exit()
         else:
-            print("Invalid choice")
+            click.echo("\033[91m Invalid choice \033[0m")
 
 
 def menu():
-    click.echo("\nHappy Hearts Pediatric Center:")
+    click.echo("\nHappy Hearts Pediatric Center")
     click.echo("1. Registrations")
     click.echo("2. Updates")
     click.echo("3. Find Data")

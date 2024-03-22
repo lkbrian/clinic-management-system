@@ -99,7 +99,7 @@ class Child(Base):
             if chlidren:
                 print("All Children")
                 for child in chlidren:
-                    print(child)
+                    print(f"\n Name {child.Fullname} of Age {child.Age} ")
             else:
                 print("No children found.")
         except Exception as error:
