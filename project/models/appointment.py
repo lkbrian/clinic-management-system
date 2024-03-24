@@ -74,14 +74,13 @@ class Appointment(Base):
                 Doctor_Incharge=Doctor_Incharge,
                 Appointment_Date=appointment_date,
             )
-            try:
-                session.add(appointment)
-                session.commit()
-                print(appointment)
-            except Exception as error:
-                print("Error: ", error)
-        else:
-            print("Appointment date must be later than today")
+        try:
+            session.add(appointment)
+            session.commit()
+            print(appointment)
+        except Exception as error:
+            print("Error: ", error) if error else print("Appointment date must be later than today")
+            
 
     @classmethod
     def vaccinate(cls, cert):
@@ -126,9 +125,43 @@ class Appointment(Base):
         else:
             print("No appointments found for", value)
 
+
     @classmethod
-    def update_appointments():
-        pass
+    def update_appointment(
+        cls,
+        Appointment_No,
+        Vaccine=None,
+        Status=None,
+        Doctor_Incharge=None,
+        Appointment_Date=None,
+    ):
+
+        try:
+            appointment = session.query(cls).filter_by(Appointment_No=Appointment_No).first()
+            if appointment:
+                if Vaccine:
+                    appointment.Vaccine = Vaccine
+                if Status:
+                    appointment.Status = Status
+                if Doctor_Incharge:
+                    appointment.Doctor_Incharge = Doctor_Incharge
+                if Appointment_Date:
+                    appointment_date = datetime.strptime(Appointment_Date, "%Y-%m-%d").date()
+                    if appointment_date > date.today():
+                        appointment.Appointment_Date = appointment_date
+                    else:
+                        print("\033[91mError: Appointment date must be later than today\033[0m")
+                        return None
+
+                session.commit()
+                print("\033[92mAppointment updated successfully.\033[0m")
+                return appointment
+            else:
+                print("\033[91mNo Such Appointment.\33[0m")
+        except Exception as error:
+            session.rollback()
+            print(f"\033[91mError: {error}\033[0m")
+
 
     @classmethod
     def get_vaccinated(cls):
@@ -170,6 +203,6 @@ class Appointment(Base):
                             f"\n--------Appointment for-------- \n{appointment.Childname} by {appointment.Doctor_Incharge} \nScheduled for {appointment.Appointment_Date} \nAccompanied by {appointment.Parentname} \nAppointment Number: {appointment.Appointment_No}\nStatus: \033[91m {appointment.Status} \033[0m \n --------------------------------"
                         )
             else:
-                print("No appointments found.")
+                print("\033[91m No appointments found. \033[0m")
         except Exception as error:
-            print("Error: ", error)
+            print(f"\033[91m Error:  {error}\033[0m")

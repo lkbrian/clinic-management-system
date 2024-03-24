@@ -5,8 +5,8 @@ from models import Base, session
 class Parent(Base):
     __tablename__ = "parents"
     id = Column(Integer, primary_key=True, nullable=False)
-    Fathers_Name = Column(String, nullable=True)
-    Mothers_Name = Column(String, nullable=True)
+    Fathers_Name = Column(String)
+    Mothers_Name = Column(String)
     National_ID = Column(Integer, unique=True, nullable=False)
 
     # children = relationship("Child", back_populates="parent")
@@ -25,7 +25,7 @@ class Parent(Base):
             parent = cls(
                 Fathers_Name=Fathersname,
                 Mothers_Name=Mothersname,
-                National_ID=National_ID,
+                National_ID=int(National_ID),
             )
             try:
                 session.add(parent)
@@ -57,22 +57,21 @@ class Parent(Base):
         else:
             print("\033[91m No Parents were found!\033[0m")
 
+
     @classmethod
-    def update_parent(
-        cls, parent_id, Fathersname=None, Mothersname=None, National_ID=None
-    ):
-        parent = session.query(cls).get(parent_id)
+    def update_parent(cls,National_ID=None, Fathersname=None, Mothersname=None,Nationalid =None):
+        parent = session.query(cls).filter_by(National_ID=National_ID).first()
         if parent:
             if Fathersname:
                 parent.Fathers_Name = Fathersname
             if Mothersname:
                 parent.Mothers_Name = Mothersname
             if National_ID:
-                parent.National_ID = National_ID
+                parent.National_ID = Nationalid
             try:
                 session.commit()
-                print("Parent updated successfully.")
-                print(parent)
+                print(f"Fathers Name: {parent.Fathers_Name}, Mothers Name: {parent.Mothers_Name}, National ID: {parent.National_ID}")
+                print("\033[92mParent updated successfully.\033[0m")
             except Exception as e:
                 session.rollback()
                 print(f" \033[91m Error: {e} \033[0m")

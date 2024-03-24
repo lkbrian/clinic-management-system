@@ -26,65 +26,71 @@ class Child(Base):
 
     @classmethod
     def calculate_age(cls, Date_Of_birth):
-        birth_date = Date_Of_birth
-        current_date = date.today()
-        years = current_date.year - birth_date.year
-        months = current_date.month - birth_date.month
-        days = current_date.day - birth_date.day
+        if Date_Of_birth < date.today():
+            birth_date = Date_Of_birth
+            current_date = date.today()
+            years = current_date.year - birth_date.year
+            months = current_date.month - birth_date.month
+            days = current_date.day - birth_date.day
 
-        if months < 0 or (months == 0 and days < 0):
-            years -= 1
-            if months < 0:
-                months += 12
-            else:
-                months = 11
-            if days < 0:
-                days += 30
+            if months < 0 or (months == 0 and days < 0):
+                years -= 1
+                if months < 0:
+                    months += 12
+                else:
+                    months = 11
+                if days < 0:
+                    days += 30
 
-        weeks = days // 7
-        days %= 7
+            weeks = days // 7
+            days %= 7
 
-        return years, months, weeks, days
+            return years, months, weeks, days
+        else:
+            print("\033[91m Enter a past date \033[0m")
 
     @classmethod
     def add_child(cls, full_name, Certificate_No, Date_of_birth, parent_id):
         from models import Parent
 
-        National_ID = session.query(Parent).filter_by(National_ID=parent_id).first()
-        if National_ID:
-            # Convert Date_of_birth string to Python date object
-            calculated_date = datetime.strptime(Date_of_birth, "%Y-%m-%d").date()
+        try:
+            parent = session.query(Parent).filter_by(National_ID=parent_id).first()
+            if parent:
+                calculated_date = datetime.strptime(Date_of_birth, "%Y-%m-%d").date()
 
-            # Calculate age using Python date object
-            years, months, weeks, days = cls.calculate_age(calculated_date)
+                years, months, weeks, days = cls.calculate_age(calculated_date)
 
-            age = f"{years}y {months}m {weeks}w"
-            child = cls(
-                Fullname=full_name,
-                Certificate_No=Certificate_No,
-                Date_Of_Birth=calculated_date,  # Pass Python date object
-                Age=age,
-                parent_id=parent_id,
-            )
-            try:
+                age = f"{years}y {months}m {weeks}w"
+                child = cls(
+                    Fullname=full_name,
+                    Certificate_No=Certificate_No,
+                    Date_Of_Birth=calculated_date,
+                    Age=age,
+                    parent_id=parent.National_ID,
+                )
                 session.add(child)
                 session.commit()
                 print(child)
+                print("\033[92m Child registered successfully.\033[0m")
                 return child
-            except Exception as error:
-                session.rollback()
-                print(f"Error: {error}")
-        else:
-            print("The parent is not registered")
+            else:
+                print("\033[91m No Parernt with such Identification \33[0m")
+        except Exception as error:
+            session.rollback()
+            print(f"\033[91m Error: {error} \033[0m")
 
     @classmethod
     def find_child(cls, value):
-        children = session.query(cls).filter(
-            or_(cls.Fullname == value, cls.Certificate_No == value)
-        ).all()
+        children = (
+            session.query(cls)
+            .filter(or_(cls.Fullname == value, cls.Certificate_No == value))
+            .all()
+        )
         if children:
             for child in children:
-                print(f"{child.Fullname} Age {child.Age} Certificate no. {child.Certificate_No}")
+                print(
+                    f"{child.Fullname} Age {child.Age} Certificate no. {child.Certificate_No}"
+                )
         else:
             print(f"No Record of {value} in the system")
 
@@ -103,4 +109,49 @@ class Child(Base):
             else:
                 print("No children found.")
         except Exception as error:
-            print("Error: ",error)
+            print("Error: ", error)
+
+
+@classmethod
+def update_child(
+    cls,
+    Certificate_No=None,
+    full_name=None,
+    Date_of_birth=None,
+    Changed_cert=None,
+    parent_id=None,
+    new_parent_id=None,
+):
+    from models import Parent
+
+    try:
+        # Check if the parent exists
+        parent = session.query(Parent).filter_by(National_ID=new_parent_id).first()
+        if not parent:
+            print(
+                "\033[91mNew Parent not found. Please enter a valid Parent's National ID Number.\033[0m"
+            )
+            return
+
+        # Update the child if it exists
+        child = session.query(cls).filter_by(Certificate_No=Certificate_No).first()
+        if child:
+            if full_name:
+                child.Fullname = full_name
+            if Date_of_birth:
+                calculated_date = datetime.strptime(Date_of_birth, "%Y-%m-%d").date()
+                child.Date_Of_Birth = calculated_date
+            if Changed_cert:
+                child.Certificate_No = Changed_cert
+            if parent_id and parent_id != new_parent_id:
+                # Update the parent ID of the child
+                child.Parent_ID = new_parent_id
+
+            session.commit()
+            print("\033[92mChild updated successfully.\033[0m")
+            return child
+        else:
+            print("\033[91mNo child with such Certificate/Notification Number.\033[0m")
+    except Exception as error:
+        session.rollback()
+        print(f"\033[91mError: {error}\033[0m")

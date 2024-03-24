@@ -38,11 +38,9 @@ def seed_database():
     Appointment.set_appointment(child_four.Certificate_No,parent_two.National_ID,"Measles,polio","Unvaccinated","Dr.Ann Maina","2024-06-01")
     Appointment.set_appointment(child_five.Certificate_No,parent_three.National_ID,"polio","vaccinated","Dr.Beatrice Nabwire","2024-03-25")
     Appointment.set_appointment(child_six.Certificate_No,parent_four.National_ID,"Measles","Unvaccinated","Dr.Clarence Opondo","2024-05-20")
-    Appointment.set_appointment(child_seven.Certificate_No,parent_five.National_ID,"Diphtheria","vaccinated","Dr.Ann Mkawasi","2024-09-14")
-    Appointment.set_appointment(child_eight.Certificate_No,parent_six.National_ID,"Haemophilus influenzae","Unvaccinated","Dr.James Gitau","2024-04-10")
 
-    Appointment.vaccinate(child_eight.Certificate_No)
-    Appointment.vaccinate(21387)
+    # Appointment.vaccinate(child_eight.Certificate_No)
+    # Appointment.vaccinate(21387)
 
     # Appointment.find_appointment("Dr.Clarence Opondo")
     # Appointment.find_appointment(1429)

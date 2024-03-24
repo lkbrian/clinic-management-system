@@ -1,6 +1,5 @@
 # interface.py
 from models import Parent, Child, Appointment
-import subprocess
 import click
 import sys
 
@@ -12,28 +11,24 @@ def userinterface():
 
 # Registration Commands
 @click.command()
-@click.option("--name", prompt="Enter Child's Fullname: ")
+@click.option("--name", prompt="Enter Child's Fullname ")
 @click.option(
-    "--cert_no", prompt="Enter Child's Certificate/Notification Number: ", type=int
+    "--cert_no", prompt="Enter Child's Certificate/Notification Number ", type=int
 )
-@click.option("--d_o_b", prompt="Enter child's Date of Birth (YYYY-MM-DD): ")
-@click.option("--parent_id", prompt="Enter the Parent's National ID Number: ", type=int)
+@click.option("--d_o_b", prompt="Enter child's Date of Birth (YYYY-MM-DD) ")
+@click.option("--parent_id", prompt="Enter the Parent's National ID Number ", type=int)
 def register_child(name, cert_no, d_o_b, parent_id):
     try:
         Child.add_child(name, cert_no, d_o_b, parent_id)
-        click.echo("\033[92m Child registered successfully.\033[0m")
-
     except Exception as error:
-        click.echo(f"\033[92m Error during child registration: {error}\033[0m" )
+        click.echo(f"\033[92m Error during child registration: {error}\033[0m")
     consecutive_registration_action()
 
 
 @click.command()
-@click.option("--father", prompt="Enter Father's Fullname: ")
-@click.option("--mother", prompt="Enter Mother's Fullname: ")
-@click.option(
-    "--national_id", prompt="Enter the point parent's National ID Number: ", type=int
-)
+@click.option("--father", prompt="Enter Father's Fullname ")
+@click.option("--mother", prompt="Enter Mother's Fullname ")
+@click.option("--national_id", prompt="Enter the point parent's National ID Number ")
 def register_parent(father, mother, national_id):
     try:
         Parent.add_parent(father, mother, national_id)
@@ -45,12 +40,16 @@ def register_parent(father, mother, national_id):
 
 
 @click.command()
-@click.option("--child_name", prompt="Enter Child's Fullname: ")
-@click.option("--parent_name", prompt="Enter Parent's Fullname: ")
-@click.option("--vaccine", prompt="Enter Vaccine: ")
-@click.option("--status", prompt="Enter Status: ")
-@click.option("--doctor", prompt="Enter Doctor in Charge: ")
-@click.option("--appointment_date", prompt="Enter Appointment Date (YYYY-MM-DD): ")
+@click.option("--child_name", prompt="Enter Child's Certificate No ", type=int)
+@click.option("--parent_name", prompt="Enter Parent's National ID ", type=int)
+@click.option("--vaccine", prompt="Enter Vaccine ")
+@click.option(
+    "--status",
+    prompt="Enter Status ",
+    type=click.Choice(["vaccinated", "Unvaccinated"]),
+)
+@click.option("--doctor", prompt="Enter Doctor in Charge ")
+@click.option("--appointment_date", prompt="Enter Appointment Date (YYYY-MM-DD) ")
 def register_appointment(
     child_name, parent_name, vaccine, status, doctor, appointment_date
 ):
@@ -61,6 +60,8 @@ def register_appointment(
         click.echo("\033[92m Appointment set successfully.\033[0m")
     except Exception as error:
         click.echo(f"\033[91m Error during appointment setting:  {error}\033[0m")
+    consecutive_registration_action()
+
 
 # Find commands
 @click.command()
@@ -73,6 +74,7 @@ def find_parent(value):
         print("Error: ", e)
     consecutive_find_data_action()
 
+
 @click.command()
 @click.option("--value", prompt="Enter The Childs Name/Certficate Number")
 def find_child(value):
@@ -83,47 +85,54 @@ def find_child(value):
         print("Errors: ", e)
     consecutive_find_data_action()
 
+
 @click.command()
-@click.option("--value", prompt = "Enter Appointment No/Child's Name/Parent Name/Doctor In Charge:" )
+@click.option(
+    "--value", prompt="Enter Appointment No/Child's Name/Parent Name/Doctor In Charge:"
+)
 def find_appointment(value):
     prompt = int(value) if value.isdigit() else str(value)
     try:
         Appointment.find_appointment(prompt)
     except Exception as e:
-        print("Error: ",e)
+        print("Error: ", e)
     consecutive_find_data_action()
 
-#Listing commands
+
+# Listing commands
 @click.command()
 def list_parents():
     try:
         Parent.get_all_parents()
     except Exception as e:
-        print("Error: ",e)
+        print("Error: ", e)
     consecutive_list_data_action()
+
 
 @click.command()
 def list_children():
     try:
         Child.get_all_children()
     except Exception as e:
-        print("Error: ",e)
+        print("Error: ", e)
     consecutive_list_data_action()
+
 
 @click.command()
 def list_appointments():
     try:
         Appointment.get_all_appointments()
     except Exception as e:
-        print("Error: ",e)
+        print("Error: ", e)
     consecutive_list_data_action()
+
 
 @click.command()
 def list_vaccinated():
     try:
         Appointment.get_vaccinated()
     except Exception as e:
-        print("Error: ",e)
+        print("Error: ", e)
     consecutive_list_data_action()
 
 
@@ -132,10 +141,69 @@ def list_unvaccinated():
     try:
         Appointment.get_unvaccinated()
     except Exception as e:
-        print("Error: ",e)
+        print("Error: ", e)
     consecutive_list_data_action()
 
 
+@click.command()
+@click.option("--national_id", prompt="Enter National ID")
+@click.option("--father", prompt="Enter Father's Name",default=None)
+@click.option("--mother", prompt="Enter Mother's Name",default=None)
+@click.option("--change_id", prompt="Enter National ID to a new one or repeat the old")
+def update_parent(national_id,father, mother,change_id):
+    try:
+        Parent.update_parent(
+            National_ID=national_id,Fathersname=father, Mothersname=mother,Nationalid=change_id
+        )
+    except Exception as error:
+        print(f"Error: {error}")
+    consecutive_updates_action()
+
+@click.command()
+@click.option("--certificate", prompt="Enter Certificate Number")
+@click.option("--child", prompt="Enter Child's  Name")
+@click.option("--dateofbirth", prompt="Enter Dateof Birth")
+@click.option("--changed_cert", prompt="Enter A new Certificate Number or repeat the old Number")
+@click.option("--parent_id", prompt="Enter Current Parent's ID Number")
+@click.option("--new_parent_id", prompt="Enter The New Parent's ID Number if Changed")
+def updating_child(certificate, child, dateofbirth, changed_cert, parent_id, new_parent_id):
+    try:
+        Child.update_child(
+            Certificate_No=certificate,
+            full_name=child,
+            Date_of_birth=dateofbirth,
+            Changed_cert=changed_cert,
+            parent_id=parent_id,
+            new_parent_id=new_parent_id
+        )
+    except Exception as error:
+        print(f"Error: {error}")
+    consecutive_updates_action()
+
+
+
+@click.command()
+@click.option("--appointment_no", prompt="Enter Appointment Number")
+@click.option("--vaccine", prompt="Enter Vaccine",default=None)
+@click.option(
+    "--status",
+    prompt="Enter Vaccination status",
+    type=click.Choice(["vaccinated", "Unvaccinated"]),
+)
+@click.option("--docincharge", prompt="Enter the doctor incharge")
+@click.option("--date", prompt="Enter Appointment Date")
+def update_appointment(appointment_no, vaccine, status, docincharge, date):
+    try:
+        Appointment.update_appointment(
+            Appointment_No=appointment_no,
+            Vaccine=vaccine,
+            Status=status,
+            Doctor_Incharge=docincharge,
+            Appointment_Date=date,
+        )
+    except Exception as error:
+        print(f"Error: {error}")
+    consecutive_updates_action()
 
 
 userinterface.add_command(register_parent)
@@ -149,6 +217,10 @@ userinterface.add_command(list_children)
 userinterface.add_command(list_appointments)
 userinterface.add_command(list_vaccinated)
 userinterface.add_command(list_unvaccinated)
+userinterface.add_command(update_parent)
+userinterface.add_command(updating_child)
+userinterface.add_command(update_appointment)
+
 
 def Registration():
     while True:
@@ -171,13 +243,13 @@ def Updates():
         Updates_menu()
         choice = click.prompt("Please enter your choice", type=int)
         if choice == 1:
-            register_parent()
+            update_parent()
         elif choice == 2:
-            register_child()
+            updating_child()
         elif choice == 3:
-            register_appointment()
+            update_appointment()
         elif choice == 4:
-            sys.exit()
+            main()
         else:
             click.echo("\033[91m Invalid choice \033[0m")
 
@@ -210,9 +282,9 @@ def List_Data():
             list_appointments()
         elif choice == 4:
             list_unvaccinated()
-        elif choice == 7:
+        elif choice == 5:
             list_vaccinated()
-        elif choice == 8:
+        elif choice == 6:
             main()
         else:
             click.echo("\033[91m Invalid choice \033[0m")
@@ -248,7 +320,7 @@ def consecutive_find_data_action():
 
 def consecutive_updates_action():
     click.echo("\nProceed to: ")
-    click.echo("\n1. Updates menu")
+    click.echo("1. Updates menu")
     click.echo("2. Main menu")
     choice = click.prompt("Select a choice", type=int)
 
@@ -262,7 +334,7 @@ def consecutive_updates_action():
 
 def consecutive_registration_action():
     click.echo("\nProceed to: ")
-    click.echo("\n1. Registration menu")
+    click.echo("1. Registration menu")
     click.echo("2. Main menu")
     choice = click.prompt("Select a choice", type=int)
 
