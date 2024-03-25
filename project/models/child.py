@@ -78,6 +78,53 @@ class Child(Base):
         except Exception as error:
             session.rollback()
             print(f"\033[91m Error: {error} \033[0m")
+    @classmethod
+    def update_child(
+        cls,
+        Certificate=None,
+        full_name=None,
+        Date_of_birth=None,
+        Changed_cert=None,
+        parent_id=None,
+        new_parent_id=None,
+    ):
+        from models import Parent
+
+        try:
+            # Check if the parent exists
+            parent = session.query(Parent).filter_by(National_ID=new_parent_id).first()
+            if not parent:
+                print(
+                    "\033[91mNew Parent not found. Please enter a valid Parent's National ID Number.\033[0m"
+                )
+                return
+
+            # Update the child if it exists
+            child = session.query(cls).filter_by(Certificate_No=Certificate).first()
+            if child:
+                if full_name:
+                    child.Fullname = full_name
+                if Date_of_birth:
+                    calculated_date = datetime.strptime(Date_of_birth, "%Y-%m-%d").date()
+                    years, months, weeks, days = cls.calculate_age(calculated_date)
+                    age = f"{years}y {months}m {weeks}w"
+                    child.Date_Of_Birth = calculated_date
+                    child.Age = age
+                if Changed_cert:
+                    child.Certificate_No = Changed_cert
+                if parent_id and parent_id != new_parent_id:
+                    # Update the parent ID of the child
+                    child.parent_id = new_parent_id
+
+                session.commit()
+                print("\033[92m Child updated successfully.\033[0m")
+                print(f"Updated:\nName to:{child.Fullname}\nDate of birth to: {child.Date_Of_Birth}\nCertificate No to: {child.Certificate_No}\nParent's ID to: {child.parent_id} \nNew Age: {child.Age} \033")
+                return child
+            else:
+                print("\033[91mNo child with such Certificate/Notification Number.\033[0m")
+        except Exception as error:
+            session.rollback()
+            print(f"\033[91mError: {error}\033[0m")
 
     @classmethod
     def find_child(cls, value):
@@ -94,9 +141,6 @@ class Child(Base):
         else:
             print(f"No Record of {value} in the system")
 
-    @classmethod
-    def update_child():
-        pass
 
     @classmethod
     def get_all_children(cls):
@@ -112,46 +156,4 @@ class Child(Base):
             print("Error: ", error)
 
 
-@classmethod
-def update_child(
-    cls,
-    Certificate_No=None,
-    full_name=None,
-    Date_of_birth=None,
-    Changed_cert=None,
-    parent_id=None,
-    new_parent_id=None,
-):
-    from models import Parent
-
-    try:
-        # Check if the parent exists
-        parent = session.query(Parent).filter_by(National_ID=new_parent_id).first()
-        if not parent:
-            print(
-                "\033[91mNew Parent not found. Please enter a valid Parent's National ID Number.\033[0m"
-            )
-            return
-
-        # Update the child if it exists
-        child = session.query(cls).filter_by(Certificate_No=Certificate_No).first()
-        if child:
-            if full_name:
-                child.Fullname = full_name
-            if Date_of_birth:
-                calculated_date = datetime.strptime(Date_of_birth, "%Y-%m-%d").date()
-                child.Date_Of_Birth = calculated_date
-            if Changed_cert:
-                child.Certificate_No = Changed_cert
-            if parent_id and parent_id != new_parent_id:
-                # Update the parent ID of the child
-                child.Parent_ID = new_parent_id
-
-            session.commit()
-            print("\033[92mChild updated successfully.\033[0m")
-            return child
-        else:
-            print("\033[91mNo child with such Certificate/Notification Number.\033[0m")
-    except Exception as error:
-        session.rollback()
-        print(f"\033[91mError: {error}\033[0m")
+    

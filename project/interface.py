@@ -161,15 +161,15 @@ def update_parent(national_id,father, mother,change_id):
 
 @click.command()
 @click.option("--certificate", prompt="Enter Certificate Number")
-@click.option("--child", prompt="Enter Child's  Name")
-@click.option("--dateofbirth", prompt="Enter Dateof Birth")
+@click.option("--child", prompt="Enter Child's Name")
+@click.option("--dateofbirth", prompt="Enter Date of Birth (YYYY-MM-DD)")
 @click.option("--changed_cert", prompt="Enter A new Certificate Number or repeat the old Number")
 @click.option("--parent_id", prompt="Enter Current Parent's ID Number")
 @click.option("--new_parent_id", prompt="Enter The New Parent's ID Number if Changed")
 def updating_child(certificate, child, dateofbirth, changed_cert, parent_id, new_parent_id):
     try:
         Child.update_child(
-            Certificate_No=certificate,
+            Certificate=certificate,
             full_name=child,
             Date_of_birth=dateofbirth,
             Changed_cert=changed_cert,
@@ -179,6 +179,7 @@ def updating_child(certificate, child, dateofbirth, changed_cert, parent_id, new
     except Exception as error:
         print(f"Error: {error}")
     consecutive_updates_action()
+
 
 
 
