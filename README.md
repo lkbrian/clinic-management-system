@@ -69,19 +69,19 @@ To run the project, follow these steps:
 3. Navigate to the project directory.
 4. Install dependencies using Pipenv:
 
-   ```console
+   ```bash
    pipenv install
    ```
 
 5. Activate the virtual environment:
 
-   ```
+   ```bash
    pipenv shell
    ```
 
 6. Run the main interface script:
 
-   ```
+   ```bash
    python interface.py
    ```
 
