@@ -2,6 +2,7 @@
 from models import Parent, Child, Appointment
 import click
 import sys
+import pyfiglet
 
 
 vaccines = [
@@ -418,19 +419,22 @@ def main():
         elif choice == 4:
             List_Data()
         elif choice == 5:
-            click.echo("\033[92m Get Better Soon,We Are Happy To See You Leave\033[0m ")
+            click.echo("\033[92m Get Better Soon,We Are Happy To See You Leave 💨💨💨\033[0m ")
             sys.exit()
         else:
             click.echo("\033[91m Invalid choice \033[0m")
 
 
+# Generate ASCII art
+happy_hearts = pyfiglet.figlet_format("Happy Hearts")
+
 def menu():
-    click.echo("\nHappy Hearts Pediatric Center ")
-    click.echo("1. Registrations")
-    click.echo("2. Updates")
-    click.echo("3. Find Data")
-    click.echo("4. List Data")
-    click.echo("5. End Session")
+    click.echo(f"\n\033[96m{happy_hearts} \033[0m")
+    click.echo("1. Registrations 📝")
+    click.echo("2. Updates 🎯")
+    click.echo("3. Find Data 🔍")
+    click.echo("4. List Data 📋")
+    click.echo("5. End Session ⏻")
 
 
 if __name__ == "__main__":
