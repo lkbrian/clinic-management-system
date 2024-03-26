@@ -52,7 +52,6 @@ class Appointment(Base):
         Doctor_Incharge,
         Appointment_Date,
     ):
-
         appointment_date = datetime.strptime(Appointment_Date, "%Y-%m-%d").date()
         if appointment_date > date.today():
             from models import Parent, Child
@@ -62,8 +61,26 @@ class Appointment(Base):
                 session.query(Parent).filter_by(National_ID=parent_id_number).first()
             )
 
+            # Check if child is registered
+            if not child:
+                print("Child is not registered")
+                return
+
+            # Check if parent exists and matches the parent associated with the child
+            if not parent:
+                print("Parent not found")
+                return
+            elif parent.National_ID != child.parent_id:
+                print("Parent ID does not match the parent associated with the child")
+                return
+
+            # Check if child is vaccinated
+            if cls.Status == "Unvaccinated":
+                print("Child must clear vaccinations before setting an appointment")
+                return
+
+            # Set appointment
             appointment = cls(
-                # Appointment_No=str(uuid.uuid4()),
                 Appointment_No=random.randint(5864, 20000),
                 Childname=child.Fullname,
                 Parentname=(
@@ -74,13 +91,16 @@ class Appointment(Base):
                 Doctor_Incharge=Doctor_Incharge,
                 Appointment_Date=appointment_date,
             )
-        try:
-            session.add(appointment)
-            session.commit()
-            print(appointment)
-        except Exception as error:
-            print("Error: ", error) if error else print("Appointment date must be later than today")
-            
+
+            try:
+                session.add(appointment)
+                session.commit()
+                print(appointment)
+                print("\033[92m Appointment set successfully \033[0m")
+            except Exception as error:
+                print("Error: ", error)
+        else:
+            print("\033[91m Appointment date must be later than today \033[0m")
 
     @classmethod
     def vaccinate(cls, cert):
@@ -125,7 +145,6 @@ class Appointment(Base):
         else:
             print("No appointments found for", value)
 
-
     @classmethod
     def update_appointment(
         cls,
@@ -137,7 +156,9 @@ class Appointment(Base):
     ):
 
         try:
-            appointment = session.query(cls).filter_by(Appointment_No=Appointment_No).first()
+            appointment = (
+                session.query(cls).filter_by(Appointment_No=Appointment_No).first()
+            )
             if appointment:
                 if Vaccine:
                     appointment.Vaccine = Vaccine
@@ -146,11 +167,15 @@ class Appointment(Base):
                 if Doctor_Incharge:
                     appointment.Doctor_Incharge = Doctor_Incharge
                 if Appointment_Date:
-                    appointment_date = datetime.strptime(Appointment_Date, "%Y-%m-%d").date()
+                    appointment_date = datetime.strptime(
+                        Appointment_Date, "%Y-%m-%d"
+                    ).date()
                     if appointment_date > date.today():
                         appointment.Appointment_Date = appointment_date
                     else:
-                        print("\033[91mError: Appointment date must be later than today\033[0m")
+                        print(
+                            "\033[91mError: Appointment date must be later than today\033[0m"
+                        )
                         return None
 
                 session.commit()
@@ -161,7 +186,6 @@ class Appointment(Base):
         except Exception as error:
             session.rollback()
             print(f"\033[91mError: {error}\033[0m")
-
 
     @classmethod
     def get_vaccinated(cls):

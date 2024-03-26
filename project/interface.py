@@ -4,6 +4,18 @@ import click
 import sys
 
 
+vaccines = [
+    "DTaP",
+    "MMR",
+    "IPV",
+    "Haemophilus influenzae type b",
+    "Hepatitis B",
+    "PCV13",
+    "Rotavirus",
+    "Varicella Chickenpox",
+]
+
+
 @click.group()
 def userinterface():
     pass
@@ -42,7 +54,11 @@ def register_parent(father, mother, national_id):
 @click.command()
 @click.option("--child_name", prompt="Enter Child's Certificate No ", type=int)
 @click.option("--parent_name", prompt="Enter Parent's National ID ", type=int)
-@click.option("--vaccine", prompt="Enter Vaccine ")
+@click.option(
+    "--vaccine",
+    prompt="Enter Vaccine ",
+    type=click.Choice(vaccines)
+)
 @click.option(
     "--status",
     prompt="Enter Status ",
@@ -57,10 +73,10 @@ def register_appointment(
         Appointment.set_appointment(
             child_name, parent_name, vaccine, status, doctor, appointment_date
         )
-        click.echo("\033[92m Appointment set successfully.\033[0m")
     except Exception as error:
         click.echo(f"\033[91m Error during appointment setting:  {error}\033[0m")
     consecutive_registration_action()
+
 
 
 # Find commands
@@ -76,7 +92,9 @@ def find_parent(value):
 
 
 @click.command()
-@click.option("--value", prompt="Enter The Childs Name/Certficate Number")
+@click.option(
+    "--value", prompt="Enter The Childs Name/Certficate Number/Parents ID Number"
+)
 def find_child(value):
     prompt = int(value) if value.isdigit() else str(value)
     try:
@@ -147,26 +165,34 @@ def list_unvaccinated():
 
 @click.command()
 @click.option("--national_id", prompt="Enter National ID")
-@click.option("--father", prompt="Enter Father's Name",default=None)
-@click.option("--mother", prompt="Enter Mother's Name",default=None)
+@click.option("--father", prompt="Enter Father's Name", default=None)
+@click.option("--mother", prompt="Enter Mother's Name", default=None)
 @click.option("--change_id", prompt="Enter National ID to a new one or repeat the old")
-def update_parent(national_id,father, mother,change_id):
+def update_parent(national_id, father, mother, change_id):
     try:
         Parent.update_parent(
-            National_ID=national_id,Fathersname=father, Mothersname=mother,Nationalid=change_id
+            National_ID=national_id,
+            Fathersname=father,
+            Mothersname=mother,
+            Nationalid=change_id,
         )
     except Exception as error:
         print(f"Error: {error}")
     consecutive_updates_action()
 
+
 @click.command()
 @click.option("--certificate", prompt="Enter Certificate Number")
 @click.option("--child", prompt="Enter Child's Name")
 @click.option("--dateofbirth", prompt="Enter Date of Birth (YYYY-MM-DD)")
-@click.option("--changed_cert", prompt="Enter A new Certificate Number or repeat the old Number")
+@click.option(
+    "--changed_cert", prompt="Enter A new Certificate Number or repeat the old Number"
+)
 @click.option("--parent_id", prompt="Enter Current Parent's ID Number")
 @click.option("--new_parent_id", prompt="Enter The New Parent's ID Number if Changed")
-def updating_child(certificate, child, dateofbirth, changed_cert, parent_id, new_parent_id):
+def updating_child(
+    certificate, child, dateofbirth, changed_cert, parent_id, new_parent_id
+):
     try:
         Child.update_child(
             Certificate=certificate,
@@ -174,18 +200,16 @@ def updating_child(certificate, child, dateofbirth, changed_cert, parent_id, new
             Date_of_birth=dateofbirth,
             Changed_cert=changed_cert,
             parent_id=parent_id,
-            new_parent_id=new_parent_id
+            new_parent_id=new_parent_id,
         )
     except Exception as error:
         print(f"Error: {error}")
     consecutive_updates_action()
 
 
-
-
 @click.command()
 @click.option("--appointment_no", prompt="Enter Appointment Number")
-@click.option("--vaccine", prompt="Enter Vaccine",default=None)
+@click.option("--vaccine", prompt="Enter Vaccine", default=None)
 @click.option(
     "--status",
     prompt="Enter Vaccination status",
@@ -401,7 +425,7 @@ def main():
 
 
 def menu():
-    click.echo("\nHappy Hearts Pediatric Center")
+    click.echo("\nHappy Hearts Pediatric Center ")
     click.echo("1. Registrations")
     click.echo("2. Updates")
     click.echo("3. Find Data")

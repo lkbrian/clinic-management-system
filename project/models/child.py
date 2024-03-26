@@ -78,6 +78,7 @@ class Child(Base):
         except Exception as error:
             session.rollback()
             print(f"\033[91m Error: {error} \033[0m")
+
     @classmethod
     def update_child(
         cls,
@@ -105,7 +106,9 @@ class Child(Base):
                 if full_name:
                     child.Fullname = full_name
                 if Date_of_birth:
-                    calculated_date = datetime.strptime(Date_of_birth, "%Y-%m-%d").date()
+                    calculated_date = datetime.strptime(
+                        Date_of_birth, "%Y-%m-%d"
+                    ).date()
                     years, months, weeks, days = cls.calculate_age(calculated_date)
                     age = f"{years}y {months}m {weeks}w"
                     child.Date_Of_Birth = calculated_date
@@ -118,10 +121,14 @@ class Child(Base):
 
                 session.commit()
                 print("\033[92m Child updated successfully.\033[0m")
-                print(f"Updated:\nName to:{child.Fullname}\nDate of birth to: {child.Date_Of_Birth}\nCertificate No to: {child.Certificate_No}\nParent's ID to: {child.parent_id} \nNew Age: {child.Age} \033")
+                print(
+                    f"Updated:\nName to:{child.Fullname}\nDate of birth to: {child.Date_Of_Birth}\nCertificate No to: {child.Certificate_No}\nParent's ID to: {child.parent_id} \nNew Age: {child.Age} \033"
+                )
                 return child
             else:
-                print("\033[91mNo child with such Certificate/Notification Number.\033[0m")
+                print(
+                    "\033[91mNo child with such Certificate/Notification Number.\033[0m"
+                )
         except Exception as error:
             session.rollback()
             print(f"\033[91mError: {error}\033[0m")
@@ -130,17 +137,24 @@ class Child(Base):
     def find_child(cls, value):
         children = (
             session.query(cls)
-            .filter(or_(cls.Fullname == value, cls.Certificate_No == value))
+            .filter(
+                or_(
+                    cls.Fullname == value,
+                    cls.Certificate_No == value,
+                    cls.parent_id == value,
+                )
+            )
             .all()
         )
         if children:
-            for child in children:
+            [
                 print(
                     f"{child.Fullname} Age {child.Age} Certificate no. {child.Certificate_No}"
                 )
+                for child in children
+            ]
         else:
             print(f"No Record of {value} in the system")
-
 
     @classmethod
     def get_all_children(cls):
@@ -148,12 +162,12 @@ class Child(Base):
             chlidren = session.query(cls).all()
             if chlidren:
                 print("All Children")
-                for child in chlidren:
+                # use of list expression
+                [
                     print(f"\n Name {child.Fullname} of Age {child.Age} ")
+                    for child in chlidren
+                ]
             else:
                 print("No children found.")
         except Exception as error:
             print("Error: ", error)
-
-
-    
